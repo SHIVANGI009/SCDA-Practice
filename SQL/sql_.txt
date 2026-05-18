@@ -1,0 +1,265 @@
+================================================================
+SCDA SQL PRACTICE — BASIC + INTERMEDIATE
+================================================================
+
+------------------------------------------------------------
+TOPIC 1: SELECT + FROM
+------------------------------------------------------------
+
+Q1. Orders table se saare columns dikhao.
+-> SELECT * FROM ORDERS;
+
+Q2. Products table se sirf product_name aur price dikhao.
+-> SELECT PRODUCT_NAME, PRICE FROM PRODUCTS;
+
+Q3. Inventory table se product_name aur stock_quantity dikhao
+    — stock_quantity ko "AVAILABLE_STOCK" naam se dikhao.
+-> SELECT PRODUCT_NAME, STOCK_QUANTITY AS AVAILABLE_STOCK 
+   FROM INVENTORY;
+
+------------------------------------------------------------
+TOPIC 2: WHERE
+------------------------------------------------------------
+
+Q4. Products table se woh products dikhao jinka price 500 se zyada ho.
+-> SELECT PRODUCT_NAME FROM PRODUCTS
+   WHERE PRICE > 500;
+
+Q5. Orders table se woh orders dikhao jinka status 'DELIVERED' ho.
+-> SELECT ORDER_ID, PRODUCT_NAME FROM ORDERS
+   WHERE STATUS = 'DELIVERED';
+
+Q6. Inventory table se woh products dikhao jinka stock 50 se kam ho
+    — product_name aur stock_quantity dikhao.
+-> SELECT PRODUCT_NAME, STOCK_QUANTITY FROM INVENTORY
+   WHERE STOCK_QUANTITY < 50;
+
+------------------------------------------------------------
+TOPIC 3: AND / OR / NOT
+------------------------------------------------------------
+
+Q7. Products table se woh products dikhao jinka price 100 se zyada ho
+    AUR category 'ELECTRONICS' ho.
+-> SELECT PRODUCT_NAME, PRICE FROM PRODUCTS
+   WHERE PRICE > 100 AND CATEGORY = 'ELECTRONICS';
+
+Q8. Orders table se woh orders dikhao jinka status
+    'PENDING' YA 'DELAYED' ho.
+-> SELECT ORDER_ID, PRODUCT_NAME FROM ORDERS
+   WHERE STATUS = 'PENDING' OR STATUS = 'DELAYED';
+
+Q9. Inventory table se woh products dikhao jo 'DISCONTINUED'
+    nahi hain AUR jinka stock 20 se kam ho.
+-> SELECT PRODUCT_NAME, STOCK_QUANTITY FROM INVENTORY
+   WHERE NOT STATUS = 'DISCONTINUED' AND STOCK_QUANTITY < 20;
+
+------------------------------------------------------------
+TOPIC 4: ORDER BY
+------------------------------------------------------------
+
+Q10. Products table se saare products price ke hisaab se
+     descending order mein dikhao.
+-> SELECT PRODUCT_NAME, PRICE FROM PRODUCTS
+   ORDER BY PRICE DESC;
+
+Q11. Orders table se order_id aur order_value dikhao
+     — sabse choti value pehle.
+-> SELECT ORDER_ID, ORDER_VALUE FROM ORDERS
+   ORDER BY ORDER_VALUE ASC;
+
+Q12. Inventory table se product_name aur stock_quantity dikhao
+     — stock sabse kam wala pehle — sirf woh products
+     jinka stock 50 se kam ho.
+-> SELECT PRODUCT_NAME, STOCK_QUANTITY FROM INVENTORY
+   WHERE STOCK_QUANTITY < 50
+   ORDER BY STOCK_QUANTITY ASC;
+
+------------------------------------------------------------
+TOPIC 5: LIMIT
+------------------------------------------------------------
+
+Q13. Products table se sirf top 5 sabse mehnge products dikhao.
+-> SELECT PRODUCT_NAME, PRICE FROM PRODUCTS
+   ORDER BY PRICE DESC
+   LIMIT 5;
+
+Q14. Orders table se top 5 highest value orders dikhao
+     — order_id aur order_value.
+-> SELECT ORDER_ID, ORDER_VALUE FROM ORDERS
+   ORDER BY ORDER_VALUE DESC
+   LIMIT 5;
+
+Q15. Inventory table se sabse kam stock wale 10 products dikhao
+     — product_name aur stock_quantity.
+-> SELECT PRODUCT_NAME, STOCK_QUANTITY FROM INVENTORY
+   ORDER BY STOCK_QUANTITY ASC
+   LIMIT 10;
+
+------------------------------------------------------------
+TOPIC 6: DISTINCT
+------------------------------------------------------------
+
+Q16. Orders table se saari unique cities dikhao.
+-> SELECT DISTINCT CITY FROM ORDERS;
+
+Q17. Orders table mein kitne unique products ordered hain
+     — count nikalo.
+-> SELECT COUNT(DISTINCT PRODUCT_NAME) AS UNIQUE_PRODUCT
+   FROM ORDERS;
+
+Q18. Suppliers table se saare unique cities dikhao
+     jahan Active suppliers hain.
+-> SELECT DISTINCT CITY FROM SUPPLIERS
+   WHERE STATUS = 'ACTIVE';
+
+------------------------------------------------------------
+TOPIC 7: NULL
+------------------------------------------------------------
+
+Q19. Orders table se woh orders dikhao jinka delivery_date NULL ho
+     — order_id, product_name, delivery_date dikhao.
+-> SELECT ORDER_ID, PRODUCT_NAME, DELIVERY_DATE 
+   FROM ORDERS
+   WHERE DELIVERY_DATE IS NULL;
+
+Q20. Suppliers table se woh suppliers dikhao jinka
+     contact_number NULL nahi hai.
+-> SELECT SUPPLIER_NAME 
+   FROM SUPPLIERS
+   WHERE CONTACT_NUMBER IS NOT NULL;
+
+Q21. Orders table se order_id aur delivery_date dikhao
+     — jahan delivery_date NULL ho uski jagah
+     "NOT SCHEDULED" dikhao — COALESCE use karo.
+-> SELECT ORDER_ID, COALESCE(DELIVERY_DATE, 'NOT SCHEDULED') 
+   FROM ORDERS;
+
+------------------------------------------------------------
+TOPIC 8: GROUP BY
+------------------------------------------------------------
+
+Q22. Orders table se har city ka total order_value nikalo.
+-> SELECT CITY, SUM(ORDER_VALUE)
+   FROM ORDERS
+   GROUP BY CITY;
+
+Q23. Orders table se har product ki total quantity sold nikalo
+     — descending order mein.
+-> SELECT PRODUCT_NAME, SUM(QUANTITY) 
+   FROM ORDERS
+   GROUP BY PRODUCT_NAME
+   ORDER BY SUM(QUANTITY) DESC;
+
+Q24. Inventory table se har warehouse ka total stock nikalo
+     — sirf woh warehouses dikhao jinka total stock 1000 se zyada ho.
+-> SELECT WAREHOUSE_NAME, SUM(QUANTITY_STOCK)
+   FROM INVENTORY
+   GROUP BY WAREHOUSE_NAME
+   HAVING SUM(QUANTITY_STOCK) > 1000;
+
+------------------------------------------------------------
+TOPIC 9: HAVING
+------------------------------------------------------------
+
+Q25. Orders table se har city ka total order_value nikalo
+     — sirf woh cities dikhao jinka total 10000 se zyada ho.
+-> SELECT CITY, SUM(ORDER_VALUE) FROM ORDERS
+   GROUP BY CITY
+   HAVING SUM(ORDER_VALUE) > 10000;
+
+Q26. Orders table se har product ka order count nikalo
+     — sirf woh products dikhao jinke 3 se zyada orders hain.
+-> SELECT PRODUCT_NAME, COUNT(QUANTITY) FROM ORDERS
+   GROUP BY PRODUCT_NAME
+   HAVING COUNT(ORDER_ID) > 3;
+
+Q27. Orders table se sirf Delivered orders lo — har supplier ka
+     average delivery_days nikalo — sirf woh suppliers dikhao
+     jinka average 5 din se zyada ho — descending order mein.
+-> SELECT SUPPLIER_NAME, AVG(DELIVERY_DAYS) AS AVERAGE FROM ORDERS
+   WHERE STATUS = 'DELIVERED'
+   GROUP BY SUPPLIER_NAME
+   HAVING AVG(DELIVERY_DAYS) > 5
+   ORDER BY AVERAGE DESC;
+
+------------------------------------------------------------
+TOPIC 10: COUNT / SUM / AVG / MIN / MAX
+------------------------------------------------------------
+
+Q28. Orders table se total orders count karo, total revenue nikalo,
+     aur average order value nikalo.
+-> SELECT COUNT(ORDER_ID), SUM(ORDER_VALUE), AVG(ORDER_VALUE)
+   FROM ORDERS;
+
+Q29. Products table se sabse sasta aur sabse mehenga
+     product ka price nikalo.
+-> SELECT MIN(PRICE), MAX(PRICE)
+   FROM PRODUCTS;
+
+Q30. Orders table se har region ka total orders, total revenue,
+     average delivery days nikalo — descending order by total revenue.
+-> SELECT REGION, COUNT(ORDER_ID), SUM(ORDER_VALUE), AVG(DELIVERY_DAYS)
+   FROM ORDERS
+   GROUP BY REGION
+   ORDER BY SUM(ORDER_VALUE) DESC;
+
+------------------------------------------------------------
+TOPIC 11: JOINS
+------------------------------------------------------------
+
+Q31. Orders aur Customers table ko join karo
+     — order_id aur customer_name dikhao.
+-> SELECT O.ORDER_ID, C.CUSTOMER_NAME
+   FROM ORDERS O
+   INNER JOIN CUSTOMERS C ON O.CUSTOMER_ID = C.CUSTOMER_ID;
+
+Q32. Orders aur Suppliers table ko LEFT JOIN karo — saare orders
+     dikhao chahe supplier assigned ho ya na ho
+     — order_id, order_value, supplier_name dikhao.
+-> SELECT O.ORDER_ID, O.ORDER_VALUE, S.SUPPLIER_NAME
+   FROM ORDERS O
+   LEFT JOIN SUPPLIERS S ON O.SUPPLIER_ID = S.SUPPLIER_ID;
+
+Q33. Orders, Products aur Suppliers teeno tables join karo
+     — sirf Delivered orders dikhao — product_name, supplier_name,
+     total order_value dikhao — supplier wise group karo
+     — descending order by total value.
+-> SELECT P.PRODUCT_NAME, S.SUPPLIER_NAME, SUM(O.ORDER_VALUE) AS TOTAL_VALUE
+   FROM ORDERS O
+   INNER JOIN PRODUCTS P ON O.PRODUCT_ID = P.PRODUCT_ID
+   INNER JOIN SUPPLIERS S ON O.SUPPLIER_ID = S.SUPPLIER_ID
+   WHERE O.STATUS = 'DELIVERED'
+   GROUP BY P.PRODUCT_NAME, S.SUPPLIER_NAME
+   ORDER BY TOTAL_VALUE DESC;
+
+------------------------------------------------------------
+TOPIC 12: BETWEEN / IN / LIKE / AS
+------------------------------------------------------------
+
+Q34. Products table se woh products dikhao
+     jinka price 200 aur 800 ke beech ho.
+-> SELECT PRODUCT_NAME, PRICE FROM PRODUCTS
+   WHERE PRICE BETWEEN 200 AND 800;
+
+Q35. Orders table se woh orders dikhao jinka status
+     'PENDING', 'DELAYED', ya 'CANCELLED' mein se koi ek ho
+     — IN use karo.
+-> SELECT ORDER_ID, PRODUCT_NAME
+   FROM ORDERS
+   WHERE STATUS IN ('PENDING', 'DELAYED', 'CANCELLED');
+
+Q36. Orders table se March 2024 ke orders lo — sirf Mumbai,
+     Delhi, Chennai cities ke — sirf woh orders jinka
+     order_id 'ORD' se shuru ho — order_id, city, order_date,
+     order_value dikhao — value descending order mein.
+-> SELECT ORDER_ID, CITY, ORDER_DATE, ORDER_VALUE
+   FROM ORDERS
+   WHERE 
+   ORDER_DATE BETWEEN '01-03-2024' AND '31-03-2024'
+   AND CITY IN ('MUMBAI', 'DELHI', 'CHENNAI')
+   AND ORDER_ID LIKE 'ORD%'
+   ORDER BY ORDER_VALUE DESC;
+
+================================================================
+END OF BASIC + INTERMEDIATE SQL
+================================================================
