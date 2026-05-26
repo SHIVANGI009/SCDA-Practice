@@ -1,0 +1,47 @@
+1. Find the total sum of `LAT_N` and `LONG_W` columns rounded to 2 decimal places.
+ SELECT ROUND(SUM(LAT_N), 2), ROUND(SUM(LONG_W), 2)
+ FROM STATION;
+
+2. Find the sum of LAT_N values lying between a given range and truncate the result to 4 decimal places.
+ SELECT TRUNCATE(SUM(LAT_N), 4)
+FROM STATION
+WHERE LAT_N > 38.7880
+  AND LAT_N < 137.2345;
+
+3. Find distinct CITY names having even ID numbers.
+SELECT DISTINCT(CITY) 
+FROM STATION
+WHERE ID % 2 = 0;
+
+4. Find the difference between total CITY entries and unique CITY entries.
+SELECT COUNT(CITY) - COUNT(DISTINCT(CITY)) 
+FROM STATION;
+
+5. Find the shortest and longest CITY names along with their lengths. If multiple exist, choose the alphabetically first one.
+SELECT CITY, LENGTH(CITY)
+FROM STATION
+ORDER BY LENGTH(CITY) ASC, CITY ASC
+LIMIT 1;
+
+SELECT CITY, LENGTH(CITY)
+FROM STATION
+ORDER BY LENGTH(CITY) DESC, CITY ASC
+LIMIT 1;
+
+6. Find distinct CITY names starting with vowels.
+SELECT DISTINCT(CITY) 
+FROM STATION
+WHERE CITY LIKE 'a%'
+ OR CITY LIKE 'e%' 
+ OR CITY LIKE 'i%' 
+ OR CITY LIKE 'o%' 
+ OR CITY LIKE 'u%';
+
+7. Find distinct CITY names ending with vowels.
+SELECT DISTINCT CITY
+FROM STATION
+WHERE CITY LIKE '%a'
+ OR CITY LIKE '%e'
+ OR CITY LIKE '%i'
+ OR CITY LIKE '%o'
+ OR CITY LIKE '%u';
