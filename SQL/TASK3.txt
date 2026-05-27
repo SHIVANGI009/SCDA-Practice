@@ -1,0 +1,130 @@
+1. Date Functions
+Q1 (Basic): ORDERS table se order_id aur order_date fetch karo. Ek naya column banao due_date jo order_date ke theek 7 din baad ki date dikhaye.
+
+SELECT order_id, 
+       order_date, 
+       DATE_ADD(order_date, INTERVAL 7 DAY) AS due_date 
+FROM orders;
+
+
+Q2 (Intermediate): ORDERS table se un orders ko filter karo jinka delivery_days 5 se zyada hai. Saath hi ek naya column banao jo delivery_date aur order_date ke beech ka exact gap (din mein) calculate karke dikhaye.
+
+SELECT order_id, 
+       DATEDIFF(delivery_date, order_date) AS lead_time
+FROM orders
+WHERE delivery_days > 5;
+
+
+Q3 (SCDA Level - Real World): ORDERS table se sirf un orders ki details nikalo jo 'May 2026' mein place hue the aur jinka status 'Pending' hai.
+
+SELECT * FROM orders
+WHERE MONTH(order_date) = 5 
+  AND YEAR(order_date) = 2026 
+  AND status = 'Pending';
+
+
+2. EXISTS / NOT EXISTS (Correlated Subqueries)
+Q1 (Basic): CUSTOMERS table se un sabhi customers ka customer_name nikalo jinhone ORDERS table mein kam se kam ek order place kiya hai.
+
+SELECT customer_name 
+FROM customers c
+WHERE EXISTS (
+    SELECT 1 
+    FROM orders o 
+    WHERE o.customer_id = c.customer_id
+);
+
+
+Q2 (Intermediate): SUPPLIERS table se un suppliers ka supplier_name aur city dhoondh kar nikalo, jinka ORDERS table mein ek bhi order maujood nahi hai.
+
+SELECT supplier_name, city 
+FROM suppliers s
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM orders o 
+    WHERE o.supplier_id = s.supplier_id
+);
+
+
+Q3 (SCDA Level - Real World): INVENTORY table se un products ka product_name aur warehouse_name nikalna hai, jinke related kam se kam ek order ORDERS table mein 'Pending' status ke sath exist karta hai.
+
+SELECT product_name, warehouse_name 
+FROM inventory i
+WHERE EXISTS (
+    SELECT 1 
+    FROM orders o
+    WHERE o.product_name = i.product_name 
+      AND o.status = 'Pending'
+);
+
+
+3. Window Functions
+Q1 (Basic): ORDERS table se customer_id, order_id, aur order_value fetch karo. Ek naya column banao row_num jo har ek customer ke orders ko unke order_value (highest to lowest) ke hisaab se ek unique sequential row number de.
+
+SELECT customer_id, order_id, order_value,
+       ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_value DESC) AS row_num
+FROM orders;
+
+
+Q2 (Intermediate): INVENTORY table se har ek warehouse_name ke andar jitne bhi products hain, unki stock_quantity ke basis par unhe rank karna hai (highest stock ko Rank 1 milni chahiye). Agar do products ka stock same ho, toh rank repeat ho par agla number skip na ho.
+
+SELECT warehouse_name, stock_quantity, 
+       DENSE_RANK() OVER(PARTITION BY warehouse_name ORDER BY stock_quantity DESC) AS stock_rate
+FROM inventory;
+
+
+Q3 (SCDA Level - Real World): MONTHLY_SALES table mein columns hain: product_name, sales_month, aur total_sales. Humein har product ke liye uski current month ki sales ke theek bagal mein pichle mahine ki sales ka column chahiye.
+
+SELECT product_name, sales_month, total_sales,
+       LAG(total_sales, 1) OVER(PARTITION BY product_name ORDER BY sales_month) AS last_month_stock
+FROM monthly_sales;
+
+
+4. CTEs (Common Table Expressions)
+Q1 (Basic): Ek CTE banao jiska naam HighValueOrders ho, jo ORDERS table se sirf un orders ko select kare jinka order_value > 5000 hai. Uske baad, main query mein iss CTE ka use karke customer_id aur order_value dikhao.
+
+WITH Highvalueorders AS (
+    SELECT customer_id, order_value 
+    FROM orders
+    WHERE order_value > 5000
+)
+SELECT customer_id, order_value 
+FROM Highvalueorders;
+
+
+Q2 (SCDA Level - Real World): Ek CTE banao jiska naam ProductSales ho. Isme SALES table se product_id aur total sales calculate karo. Phir main query mein iss CTE ko PRODUCTS table ke saath JOIN karo, taaki aap product_name aur uska total_sales dekh sako.
+
+WITH ProductSales AS (
+    SELECT product_id, sum(sales_amount) AS total_sales
+    FROM sales
+    GROUP BY product_id
+)
+SELECT p.product_name, ps.total_sales 
+FROM ProductSales ps
+JOIN products p ON ps.product_id = p.product_id;
+
+
+5. Final Homework (CTEs + JOIN)
+Task: Ek aisi query likho jo pehle ek CTE ka use karke har department ka average sales nikale, aur phir main query mein sirf un employees ka employee_id aur total_sales dikhaye jinki individual sales, unke department ke average sales se zyada hai.
+
+WITH empdata AS (
+    SELECT department_name, AVG(total_sales) AS avg_sales
+    FROM employee_sales
+    GROUP BY department_name
+)
+SELECT es.employee_id, es.total_sales
+FROM empdata ed
+JOIN employee_sales es ON ed.department_name = es.department_name
+WHERE es.total_sales > ed.avg_sales;
+
+6. Given the CITY and COUNTRY tables, query the sum of the populations of all cities where the CONTINENT is 'Asia'.
+SELECT SUM(CITY.POPULATION)
+FROM CITY 
+INNER JOIN COUNTRY ON CITY.COUNTRYCODE = COUNTRY.CODE
+WHERE COUNTRY.CONTINENT = 'Asia';
+
+7. Given the CITY and COUNTRY tables, query the names of all cities where the CONTINENT is 'Africa'.
+SELECT CITY.NAME
+FROM CITY
+INNER JOIN COUNTRY ON CITY.COUNTRYCODE = COUNTRY.CODE
+WHERE COUNTRY.CONTINENT = 'AFRICA';
