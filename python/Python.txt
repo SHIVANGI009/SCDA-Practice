@@ -1,0 +1,82 @@
+1. Lists & Slicing
+Question: Ek list hai sales = [100, 200, 300, 400, 500, 600]. Isme se sirf beech ki values [300, 400, 500] ko slice karke nikalna hai.
+
+sales = [100, 200, 300, 400, 500, 600]
+print(sales[2:5])
+
+
+2. Tuples (Type Casting)
+Question: Ek tuple hai coordinates = (28.7041, 77.1025). Pehli value ko badalkar 29.0000 karna hai.
+
+coordinates = (28.7041, 77.1025)
+list_coord = list(coordinates)
+list_coord[0] = 29.0000
+result = tuple(list_coord)
+print(coordinates, result)
+
+
+3. Dictionaries
+Question: warehouse dictionary mein ek naya key-value pair add karna hai: "status": "Active".
+
+
+warehouse = {
+    "name": "Hub_North",
+    "capacity": 5000,
+    "manager": "Amit"
+}
+warehouse["status"] = "Active"
+print(warehouse)
+
+
+4. If/Else Logic
+Question: Check karna hai ki agar age 18 ya usse badi hai AUR uske paas license hai, toh "Can Drive" print ho, warna "cannot drive".
+
+age = 25
+has_license = True
+if(age >= 18 and has_license == True):
+    print('Can Drive')
+else:
+    print('cannot drive')
+
+
+5. While Loop
+Question: Jab tak stock > 0 hai, stock ko 1 se kam karo aur print karo. End mein "Out of Stock" print karo.
+
+stock = 3
+while stock > 0:
+    stock = stock - 1
+    print(f"{stock} Item Sold")
+
+print("Out of Stock")
+
+
+6. Functions
+Question: Ek function multiply_numbers(a, b) banao jo multiplication return kare, aur phir output ko print karo.
+
+def multiply_numbers(a, b):
+    result = a * b
+    return result
+
+output = multiply_numbers(4, 5)
+print(output)
+
+
+7. Pandas (Read, Inspect, Filter, Column Operations)
+Questions: 1. inventory_data.csv ko read karo.
+2. Missing values aur data type check karo.
+3. stock_quantity < 50 wali rows filter karo.
+4. price ka 10% nikal kar naya tax column banao.
+
+import pandas as pd
+
+# 1. Read CSV
+df = pd.read_csv("inventory_data.csv")
+
+# 2. Inspect Data
+df.info()
+
+# 3. Filter Rows
+low_stock = df[df['stock_quantity'] < 50]
+
+# 4. Column Operations
+df['tax'] = df['price'] * 0.10
